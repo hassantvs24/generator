@@ -1,0 +1,100 @@
+@extends('layouts.master')
+@extends('box.income_expense.expense')
+
+@section('title')
+    Expense
+@endsection
+@section('content')
+    <div class="row">
+        <div class="col-md-6">
+            <p><button type="button" class="btn btn-primary btn-labeled" data-toggle="modal" data-target="#myModal"><b><i class="icon-file-plus"></i></b> New Expense</button></p>
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-flat border-top-success">
+                <div class="panel-heading">
+                    <h6 class="panel-title">All Expense</h6>
+                </div>
+
+                <div class="panel-body">
+                    <table class="table table-bordered table-condensed table-hover datatable">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category Name</th>
+                            <th>Descriptions</th>
+                            <th>Amount</th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($table as $row)
+                            <tr>
+                                <td>{{pub_date($row->created_at)}}</td>
+                                <td>{{$row->category['name']}}</td>
+                                <td>{{$row->descriptions}}</td>
+                                <td>{{money($row->amountOut)}}</td>
+                                <td class="text-right">
+                                    <button class="btn btn-xs btn-success no-padding mr-5 ediBtn" data-descriptions="{{$row->descriptions}}"  data-amount="{{$row->amountOut}}" data-category="{{$row->inoutcatergoryID}}" data-id="{{$row->inouttransactionID}}" data-toggle="modal" data-target="#ediModal" title="Edit"><i class="icon-pencil5"></i></button>
+                                    <a class="btn btn-xs btn-danger no-padding" href="{{action('Expense\ExpenseController@del', ['id' => $row->inouttransactionID])}}" onclick="return confirm('Are you sure to delete?')" title="Delete"><i class="icon-bin"></i></a>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+@section('script')
+
+    <script type="text/javascript" src="{{asset('public/assets/js/plugins/ui/moment/moment.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('public/assets/js/plugins/pickers/daterangepicker.js')}}"></script>
+
+    <script type="text/javascript">
+
+
+
+        $(function () {
+            $('.ediBtn').click(function () {
+                var id = $(this).data('id');
+                var descriptions = $(this).data('descriptions');
+                var amount = $(this).data('amount');
+                var category = $(this).data('category');
+
+                $('#ediID').val(id);
+                $('#ediModal [name=inoutcatergoryID]').val(category);
+                $('#ediModal [name=amountOut]').val(amount);
+                $('#ediModal [name=descriptions]').val(descriptions);
+            });
+        });
+
+
+        $(function () {
+
+            $('.datatable').DataTable({
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    { orderable: false, "targets": [4] }//For Column Order
+                ]
+            });
+
+        });
+
+        $(function () {
+            $('.date_pick').daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            });
+        });
+
+    </script>
+
+@endsection
